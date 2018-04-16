@@ -88,7 +88,7 @@ def print_usage():
 if __name__ == "__main__":
 	if ((not sys.argv) or len(sys.argv) <= 1):
 		print_usage()
-	elif(sys.argv[1].startswith("https://github.com") or sys.argv[1].startswith("https://api.github.com")):
+	elif(sys.argv[1].startswith("https://github.com")):
 		download_repo(sys.argv[1])
 	elif(os.path.exists(sys.argv[1])):
 		repos = read_file_in_lines(sys.argv[1])
