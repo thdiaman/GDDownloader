@@ -1,9 +1,20 @@
 import os
 import sys
+import json
 from filemanager.dbmanager import DBManager
 from downloader.gitdownloader import GitDownloader
 from downloader.githubdownloader import GithubDownloader
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath
+
+def get_number_of(gdownloader, repo_api_address, statistic_type, param = None):
+	r = gdownloader.download_request(repo_api_address + "/" + statistic_type, ["per_page=100"] if param == None else ["per_page=100", param])
+	if "link" in r.headers:
+		address = r.headers["link"].split(',')[1].split('<')[1].split('>')[0]
+		data = gdownloader.download_object(address)
+		return 100 * (int(address.split('=')[-1]) - 1) + len(data)
+	else:
+		data = json.loads(r.text or r.content)
+		return len(data)
 
 def download_repo(repo_address):
 	repo_api_address = "https://api.github.com/repos/" + '/'.join(repo_address.split('/')[-2:])
@@ -16,9 +27,19 @@ def download_repo(repo_address):
 
 	if db.project_info_exists():
 		print("Project already exists! Updating...")
-	else:
-		project_info = ghd.download_object(repo_api_address)
-		db.add_project_info(project_info)
+	project_info = ghd.download_object(repo_api_address)
+	db.add_project_info(project_info)
+
+	print("Downloading project statistics...", end=' ')
+	project_stats = {
+		"issues": get_number_of(ghd, repo_api_address, "issues", "state=all"),
+		"issue_comments": get_number_of(ghd, repo_api_address, "issues/comments"),
+		"issue_events": get_number_of(ghd, repo_api_address, "issues/events"),
+		"commits": get_number_of(ghd, repo_api_address, "commits"),
+		"commit_comments": get_number_of(ghd, repo_api_address, "comments")
+	}
+	db.add_project_stats(project_stats)
+	print("Done!")
 
 	print("Downloading issues...", end=' ')
 	repo_issues_address = repo_api_address + "/issues"

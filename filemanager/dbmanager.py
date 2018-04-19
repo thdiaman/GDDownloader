@@ -33,6 +33,10 @@ class DBManager(FileManager):
 		if self.project_info_exists():
 			self.project["info"] = self.read_json_from_file(os.path.join(self.rootfolder, "info.json"))
 
+		self.project["stats"] = {}
+		if self.project_stats_exists():
+			self.project["stats"] = self.read_json_from_file(os.path.join(self.rootfolder, "stats.json"))
+
 		self.project["issues"] = {}
 		for issue_filename in os.listdir(os.path.join(self.rootfolder, "issues")):
 			issue = self.read_json_from_file(os.path.join(self.rootfolder, "issues", issue_filename))
@@ -64,6 +68,13 @@ class DBManager(FileManager):
 	def add_project_info(self, info):
 		self.project["info"] = info
 		self.write_json_to_file(os.path.join(self.rootfolder, "info.json"), info)
+
+	def project_stats_exists(self):
+		return os.path.exists(os.path.join(self.rootfolder, "stats.json"))
+
+	def add_project_stats(self, stats):
+		self.project["stats"] = stats
+		self.write_json_to_file(os.path.join(self.rootfolder, "stats.json"), stats)
 
 	def issue_exists(self, issue):
 		return issue["id"] in self.project["issues"]
