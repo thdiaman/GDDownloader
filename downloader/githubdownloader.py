@@ -53,7 +53,7 @@ class GithubDownloader:
 		:returns: True if the credentials are correct, or False otherwise.
 		"""
 		try:
-			r = requests.get("https://api.github.com/rate_limit", headers = {'Authorization': 'token ' + self.credentials})
+			r = requests.get("https://api.github.com/rate_limit", headers = {'Authorization': 'token ' + credentials})
 			if int(r.status_code) == 200:
 				content = json.loads(r.text or r.content)
 				self.set_request_number(content["resources"]["core"]["remaining"], content["resources"]["core"]["reset"])
