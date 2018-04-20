@@ -9,17 +9,16 @@ class GithubDownloader:
 	"""
 	Class that implements a downloader for the GitHub API.
 	"""
-	def __init__(self, apikey, check = False):
+	def __init__(self, apikey):
 		"""
 		Initializes this GitHub API Downloader.
 		
 		:param apikey: the GitHub api key.
-		:param check: boolean indicating whether the credentials should be checked (True) or not (False).
 		"""
 		self.remaining_requests = -1
 		self.resettime = -1
 		self.credentials = apikey
-		if check and not self.check_credentials(self.credentials):
+		if not self.check_credentials(self.credentials):
 			sys.stdout.write("Wrong Credentials!\n")
 			exit()
 
