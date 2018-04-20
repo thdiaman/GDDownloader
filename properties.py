@@ -10,3 +10,11 @@ GitHubAuthToken = 'add_here_your_token'
 
 # Set this to the path of the git executable
 gitExecutablePath = 'git'
+
+# Select what to download
+download_issues = True
+download_issue_comments = True
+download_issue_events = True
+download_commits = True
+download_commit_comments = True
+download_source_code = False

@@ -4,7 +4,9 @@ import json
 from filemanager.dbmanager import DBManager
 from downloader.gitdownloader import GitDownloader
 from downloader.githubdownloader import GithubDownloader
-from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose
+from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose,\
+	download_issues, download_issue_comments, download_issue_events,\
+	download_commits, download_commit_comments, download_source_code
 from logger.downloadlogger import Logger
 
 def get_number_of(gdownloader, repo_api_address, statistic_type, param = None):
@@ -47,55 +49,61 @@ def download_repo(repo_address):
 	db.add_project_stats(project_stats)
 	lg.end_action()
 
-	lg.start_action("Retrieving issues...", project_stats["issues"])
-	repo_issues_address = repo_api_address + "/issues"
-	for issue in ghd.download_paginated_object(repo_issues_address, ["state=all"]):
-		if not db.issue_exists(issue):
-			issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
-			db.add_project_issue(issue)
-		lg.step_action()
-	lg.end_action()
+	if download_issues:
+		lg.start_action("Retrieving issues...", project_stats["issues"])
+		repo_issues_address = repo_api_address + "/issues"
+		for issue in ghd.download_paginated_object(repo_issues_address, ["state=all"]):
+			if not db.issue_exists(issue):
+				issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
+				db.add_project_issue(issue)
+			lg.step_action()
+		lg.end_action()
 
-	lg.start_action("Retrieving issue comments...", project_stats["issue_comments"])
-	repo_issue_comments_address = repo_issues_address + "/comments"
-	for issue_comment in ghd.download_paginated_object(repo_issue_comments_address):
-		if not db.issue_comment_exists(issue_comment):
-			db.add_project_issue_comment(issue_comment)
-		lg.step_action()
-	lg.end_action()
+	if download_issue_comments:
+		lg.start_action("Retrieving issue comments...", project_stats["issue_comments"])
+		repo_issue_comments_address = repo_issues_address + "/comments"
+		for issue_comment in ghd.download_paginated_object(repo_issue_comments_address):
+			if not db.issue_comment_exists(issue_comment):
+				db.add_project_issue_comment(issue_comment)
+			lg.step_action()
+		lg.end_action()
 
-	lg.start_action("Retrieving issue events...", project_stats["issue_events"])
-	repo_issue_events_address = repo_issues_address + "/events"
-	for issue_event in ghd.download_paginated_object(repo_issue_events_address):
-		if not db.issue_event_exists(issue_event):
-			db.add_project_issue_event(issue_event)
-		lg.step_action()
-	lg.end_action()
+	if download_issue_events:
+		lg.start_action("Retrieving issue events...", project_stats["issue_events"])
+		repo_issue_events_address = repo_issues_address + "/events"
+		for issue_event in ghd.download_paginated_object(repo_issue_events_address):
+			if not db.issue_event_exists(issue_event):
+				db.add_project_issue_event(issue_event)
+			lg.step_action()
+		lg.end_action()
 
-	lg.start_action("Retrieving commits...", project_stats["commits"])
-	repo_commits_address = repo_api_address + "/commits"
-	for commit in ghd.download_paginated_object(repo_commits_address):
-		if not db.commit_exists(commit):
-			commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
-			db.add_project_commit(commit)
-		lg.step_action()
-	lg.end_action()
+	if download_commits:
+		lg.start_action("Retrieving commits...", project_stats["commits"])
+		repo_commits_address = repo_api_address + "/commits"
+		for commit in ghd.download_paginated_object(repo_commits_address):
+			if not db.commit_exists(commit):
+				commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
+				db.add_project_commit(commit)
+			lg.step_action()
+		lg.end_action()
 
-	lg.start_action("Retrieving commit comments...", project_stats["commit_comments"])
-	repo_commit_comments_address = repo_api_address + "/comments"
-	for commit_comment in ghd.download_paginated_object(repo_commit_comments_address):
-		if not db.commit_comment_exists(commit_comment):
-			db.add_project_commit_comment(commit_comment)
-		lg.step_action()
-	lg.end_action()
+	if download_commit_comments:
+		lg.start_action("Retrieving commit comments...", project_stats["commit_comments"])
+		repo_commit_comments_address = repo_api_address + "/comments"
+		for commit_comment in ghd.download_paginated_object(repo_commit_comments_address):
+			if not db.commit_comment_exists(commit_comment):
+				db.add_project_commit_comment(commit_comment)
+			lg.step_action()
+		lg.end_action()
 
-	lg.start_action("Retrieving source code...")
-	git_repo_path = os.path.join(dataFolderPath, repo_name, "sourcecode")
-	if not gd.git_repo_exists(git_repo_path):
-		gd.git_clone(repo_address, git_repo_path)
-	else:
-		gd.git_pull(git_repo_path)
-	lg.end_action()
+	if download_source_code:
+		lg.start_action("Retrieving source code...")
+		git_repo_path = os.path.join(dataFolderPath, repo_name, "sourcecode")
+		if not gd.git_repo_exists(git_repo_path):
+			gd.git_clone(repo_address, git_repo_path)
+		else:
+			gd.git_pull(git_repo_path)
+		lg.end_action()
 
 def read_file_in_lines(filename):
 	"""
