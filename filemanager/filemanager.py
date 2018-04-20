@@ -1,7 +1,22 @@
+import os
 import json
 import codecs
 
 class FileManager:
+
+	def create_folder_if_it_does_not_exist(self, foldername):
+		if not os.path.exists(foldername):
+			os.makedirs(foldername)
+
+	def read_json_from_file_if_it_exists(self, filename):
+		return self.read_json_from_file(filename) if os.path.exists(filename) else {}
+
+	def read_jsons_from_folder(self, foldername, element_id):
+		data = {}
+		for filename in os.listdir(foldername):
+			element = self.read_json_from_file(os.path.join(foldername, filename))
+			data[element[element_id]] = element
+		return data
 
 	def read_json_from_file(self, filename):
 		"""

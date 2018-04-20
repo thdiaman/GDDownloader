@@ -14,63 +14,33 @@ class DBManager(FileManager):
 
 		# Create all the necessary directories
 		self.rootfolder = rootfolder
-		if not os.path.exists(rootfolder):
-			os.makedirs(rootfolder)
-		if not os.path.exists(os.path.join(self.rootfolder, "issues")):
-			os.makedirs(os.path.join(self.rootfolder, "issues"))
-		if not os.path.exists(os.path.join(self.rootfolder, "issueComments")):
-			os.makedirs(os.path.join(self.rootfolder, "issueComments"))
-		if not os.path.exists(os.path.join(self.rootfolder, "issueEvents")):
-			os.makedirs(os.path.join(self.rootfolder, "issueEvents"))
-		if not os.path.exists(os.path.join(self.rootfolder, "commits")):
-			os.makedirs(os.path.join(self.rootfolder, "commits"))
-		if not os.path.exists(os.path.join(self.rootfolder, "commitComments")):
-			os.makedirs(os.path.join(self.rootfolder, "commitComments"))
-		if not os.path.exists(os.path.join(self.rootfolder, "sourcecode")):
-			os.makedirs(os.path.join(self.rootfolder, "sourcecode"))
+		self.create_folder_if_it_does_not_exist(rootfolder)
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "issues"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "issueComments"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "issueEvents"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commits"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commitComments"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "sourcecode"))
 
+		# Read data from files
 		self.project = {}
-		if self.project_info_exists():
-			self.project["info"] = self.read_json_from_file(os.path.join(self.rootfolder, "info.json"))
-
-		self.project["stats"] = {}
-		if self.project_stats_exists():
-			self.project["stats"] = self.read_json_from_file(os.path.join(self.rootfolder, "stats.json"))
-
-		self.project["issues"] = {}
-		for issue_filename in os.listdir(os.path.join(self.rootfolder, "issues")):
-			issue = self.read_json_from_file(os.path.join(self.rootfolder, "issues", issue_filename))
-			self.project["issues"][issue["id"]] = issue
-
-		self.project["issueComments"] = {}
-		for issue_comment_filename in os.listdir(os.path.join(self.rootfolder, "issueComments")):
-			issue_comment = self.read_json_from_file(os.path.join(self.rootfolder, "issueComments", issue_comment_filename))
-			self.project["issueComments"][issue_comment["id"]] = issue_comment
-
-		self.project["issueEvents"] = {}
-		for issue_event_filename in os.listdir(os.path.join(self.rootfolder, "issueEvents")):
-			issue_event = self.read_json_from_file(os.path.join(self.rootfolder, "issueEvents", issue_event_filename))
-			self.project["issueEvents"][issue_event["id"]] = issue_event
-
-		self.project["commits"] = {}
-		for commit_filename in os.listdir(os.path.join(self.rootfolder, "commits")):
-			commit = self.read_json_from_file(os.path.join(self.rootfolder, "commits", commit_filename))
-			self.project["commits"][commit["sha"]] = commit
-
-		self.project["commitComments"] = {}
-		for commit_comment_filename in os.listdir(os.path.join(self.rootfolder, "commitComments")):
-			commit_comment = self.read_json_from_file(os.path.join(self.rootfolder, "commitComments", commit_comment_filename))
-			self.project["commitComments"][commit_comment["id"]] = commit_comment
+		self.project["info"] = self.read_json_from_file_if_it_exists(os.path.join(self.rootfolder, "info.json"))
+		self.project["stats"] = self.read_json_from_file_if_it_exists(os.path.join(self.rootfolder, "stats.json"))
+		self.project["issues"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "issues"), "id")
+		self.project["issueComments"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "issueComments"), "id")
+		self.project["issueEvents"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "issueEvents"), "id")
+		self.project["commits"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "commits"), "sha")
+		self.project["commitComments"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "commitComments"), "id")
 
 	def project_info_exists(self):
-		return os.path.exists(os.path.join(self.rootfolder, "info.json"))
+		return bool(self.project["info"])
 
 	def add_project_info(self, info):
 		self.project["info"] = info
 		self.write_json_to_file(os.path.join(self.rootfolder, "info.json"), info)
 
 	def project_stats_exists(self):
-		return os.path.exists(os.path.join(self.rootfolder, "stats.json"))
+		return bool(self.project["stats"])
 
 	def add_project_stats(self, stats):
 		self.project["stats"] = stats
