@@ -29,6 +29,7 @@ def download_repo(repo_address):
 	repo_api_address = "https://api.github.com/repos/" + '/'.join(repo_address.split('/')[-2:])
 	repo_name = '_'.join(repo_address.split('/')[-2:])
 
+	db.create_directory_structure(repo_name)
 	project = db.read_project_from_disk(repo_name)
 
 	lg.log_action("Downloading project " + repo_name)
