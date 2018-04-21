@@ -1,19 +1,21 @@
 import os
+from properties import dataFolderPath
+from datamanager.project import Project
 from datamanager.filemanager import FileManager
 
 class DBManager(FileManager):
 	"""
 	Class that implements a DB manager.
 	"""
-	def __init__(self, rootfolder):
+	def __init__(self):
 		"""
 		Initializes this DB manager.
-		
-		:param rootfolder: folder where the data is stored.
 		"""
+		self.create_folder_if_it_does_not_exist(dataFolderPath)
 
+	def create_directory_structure(self, repo_name):
 		# Create all the necessary directories
-		self.rootfolder = rootfolder
+		rootfolder = os.path.join(dataFolderPath, repo_name)
 		self.create_folder_if_it_does_not_exist(rootfolder)
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "issues"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "issueComments"))
@@ -22,61 +24,59 @@ class DBManager(FileManager):
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commitComments"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "sourcecode"))
 
+	def read_project_from_disk(self, repo_name):
 		# Read data from files
-		self.project = {}
-		self.project["info"] = self.read_json_from_file_if_it_exists(os.path.join(self.rootfolder, "info.json"))
-		self.project["stats"] = self.read_json_from_file_if_it_exists(os.path.join(self.rootfolder, "stats.json"))
-		self.project["issues"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "issues"), "id")
-		self.project["issueComments"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "issueComments"), "id")
-		self.project["issueEvents"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "issueEvents"), "id")
-		self.project["commits"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "commits"), "sha")
-		self.project["commitComments"] = self.read_jsons_from_folder(os.path.join(self.rootfolder, "commitComments"), "id")
+		project = Project()
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		project["info"] = self.read_json_from_file_if_it_exists(os.path.join(rootfolder, "info.json"))
+		project["stats"] = self.read_json_from_file_if_it_exists(os.path.join(rootfolder, "stats.json"))
+		project["issues"] = self.read_jsons_from_folder(os.path.join(rootfolder, "issues"), "id")
+		project["issueComments"] = self.read_jsons_from_folder(os.path.join(rootfolder, "issueComments"), "id")
+		project["issueEvents"] = self.read_jsons_from_folder(os.path.join(rootfolder, "issueEvents"), "id")
+		project["commits"] = self.read_jsons_from_folder(os.path.join(rootfolder, "commits"), "sha")
+		project["commitComments"] = self.read_jsons_from_folder(os.path.join(rootfolder, "commitComments"), "id")
+		return project
 
-	def project_info_exists(self):
-		return bool(self.project["info"])
+	def write_project_to_disk(self, repo_name, project):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "info.json"), project["info"])
+		self.write_json_to_file(os.path.join(rootfolder, "stats.json"), project["stats"])
+		for issue in project["issues"].values():
+			self.write_json_to_file(os.path.join(rootfolder, "issues", str(issue["id"]) + ".json"), issue)
+		for issue_comment in project["issueComments"].values():
+			self.write_json_to_file(os.path.join(rootfolder, "issueComments", str(issue_comment["id"]) + ".json"), issue_comment)
+		for issue_event in project["issueEvents"].values():
+			self.write_json_to_file(os.path.join(rootfolder, "issueEvents", str(issue_event["id"]) + ".json"), issue_event)
+		for commit in project["commits"].values():
+			self.write_json_to_file(os.path.join(rootfolder, "commits", str(commit["sha"]) + ".json"), commit)
+		for commit_comment in project["commitComments"].values():
+			self.write_json_to_file(os.path.join(rootfolder, "commitComments", str(commit_comment["id"]) + ".json"), commit_comment)
 
-	def add_project_info(self, info):
-		self.project["info"] = info
-		self.write_json_to_file(os.path.join(self.rootfolder, "info.json"), info)
+	def write_project_info_to_disk(self, repo_name, info):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "info.json"), info)
 
-	def project_stats_exists(self):
-		return bool(self.project["stats"])
+	def write_project_stats_to_disk(self, repo_name, stats):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "stats.json"), stats)
 
-	def add_project_stats(self, stats):
-		self.project["stats"] = stats
-		self.write_json_to_file(os.path.join(self.rootfolder, "stats.json"), stats)
+	def write_project_issue_to_disk(self, repo_name, issue):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "issues", str(issue["id"]) + ".json"), issue)
 
-	def issue_exists(self, issue):
-		return issue["id"] in self.project["issues"]
+	def write_project_issue_comment_to_disk(self, repo_name, issue_comment):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "issueComments", str(issue_comment["id"]) + ".json"), issue_comment)
 
-	def add_project_issue(self, issue):
-		self.project["issues"][issue["id"]] = issue
-		self.write_json_to_file(os.path.join(self.rootfolder, "issues", str(issue["id"]) + ".json"), issue)
+	def write_project_issue_event_to_disk(self, repo_name, issue_event):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "issueComments", str(issue_event["id"]) + ".json"), issue_event)
 
-	def issue_comment_exists(self, issue_comment):
-		return issue_comment["id"] in self.project["issueComments"]
+	def write_project_commit_to_disk(self, repo_name, commit):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "commits", str(commit["sha"]) + ".json"), commit)
 
-	def add_project_issue_comment(self, issue_comment):
-		self.project["issueComments"][issue_comment["id"]] = issue_comment
-		self.write_json_to_file(os.path.join(self.rootfolder, "issueComments", str(issue_comment["id"]) + ".json"), issue_comment)
+	def write_project_commit_comment_to_disk(self, repo_name, commit_comment):
+		rootfolder = os.path.join(dataFolderPath, repo_name)
+		self.write_json_to_file(os.path.join(rootfolder, "commitComments", str(commit_comment["id"]) + ".json"), commit_comment)
 
-	def issue_event_exists(self, issue_event):
-		return issue_event["id"] in self.project["issueEvents"]
-
-	def add_project_issue_event(self, issue_event):
-		self.project["issueEvents"][issue_event["id"]] = issue_event
-		self.write_json_to_file(os.path.join(self.rootfolder, "issueEvents", str(issue_event["id"]) + ".json"), issue_event)
-
-	def commit_exists(self, commit):
-		return commit["sha"] in self.project["commits"]
-
-	def add_project_commit(self, commit):
-		self.project["commits"][commit["sha"]] = commit
-		self.write_json_to_file(os.path.join(self.rootfolder, "commits", str(commit["sha"]) + ".json"), commit)
-
-	def commit_comment_exists(self, commit_comment):
-		return commit_comment["id"] in self.project["commitComments"]
-
-	def add_project_commit_comment(self, commit_comment):
-		self.project["commitComments"][commit_comment["id"]] = commit_comment
-		self.write_json_to_file(os.path.join(self.rootfolder, "commitComments", str(commit_comment["id"]) + ".json"), commit_comment)

@@ -18,3 +18,6 @@ download_issue_events = True
 download_commits = True
 download_commit_comments = True
 download_source_code = False
+
+# Select how to write to disk
+always_write_to_disk = True
