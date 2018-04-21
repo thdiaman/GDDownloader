@@ -1,7 +1,7 @@
 import os
 import sys
 import json
-from filemanager.dbmanager import DBManager
+from datamanager.dbmanager import DBManager
 from downloader.gitdownloader import GitDownloader
 from downloader.githubdownloader import GithubDownloader
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose,\

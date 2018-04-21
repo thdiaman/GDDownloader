@@ -1,5 +1,5 @@
 import os
-from filemanager.filemanager import FileManager
+from datamanager.filemanager import FileManager
 
 class DBManager(FileManager):
 	"""
