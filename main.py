@@ -7,7 +7,7 @@ from downloader.githubdownloader import GithubDownloader
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose,\
 	download_issues, download_issue_comments, download_issue_events,\
 	download_commits, download_commit_comments, download_source_code,\
-	download_issues_full, download_commits_full, always_write_to_disk
+	download_issues_full, download_commits_full
 from logger.downloadlogger import Logger
 
 def get_number_of(gdownloader, repo_api_address, statistic_type, param = None):
@@ -29,7 +29,8 @@ def download_repo(repo_address):
 	repo_api_address = "https://api.github.com/repos/" + '/'.join(repo_address.split('/')[-2:])
 	repo_name = '_'.join(repo_address.split('/')[-2:])
 
-	db.create_directory_structure(repo_name)
+	db.initialize_write_to_disk(repo_name)
+
 	project = db.read_project_from_disk(repo_name)
 
 	lg.log_action("Downloading project " + repo_name)
@@ -37,8 +38,7 @@ def download_repo(repo_address):
 		lg.log_action("Project already exists! Updating...")
 	project_info = ghd.download_object(repo_api_address)
 	project.add_project_info(project_info)
-	if always_write_to_disk:
-		db.write_project_info_to_disk(repo_name, project["info"])
+	db.write_project_info_to_disk(repo_name, project["info"])
 
 	lg.start_action("Retrieving project statistics...", 5)
 	project_stats = {}
@@ -54,8 +54,7 @@ def download_repo(repo_address):
 	lg.step_action()
 	project.add_project_stats(project_stats)
 	lg.end_action()
-	if always_write_to_disk:
-		db.write_project_stats_to_disk(repo_name, project["stats"])
+	db.write_project_stats_to_disk(repo_name, project["stats"])
 
 	if download_issues:
 		lg.start_action("Retrieving issues...", project_stats["issues"])
@@ -65,8 +64,7 @@ def download_repo(repo_address):
 				if download_issues_full:
 					issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
 				project.add_project_issue(issue)
-				if always_write_to_disk:
-					db.write_project_issue_to_disk(repo_name, issue)
+				db.write_project_issue_to_disk(repo_name, issue)
 			lg.step_action()
 		lg.end_action()
 
@@ -76,8 +74,7 @@ def download_repo(repo_address):
 		for issue_comment in ghd.download_paginated_object(repo_issue_comments_address):
 			if not project.issue_comment_exists(issue_comment):
 				project.add_project_issue_comment(issue_comment)
-				if always_write_to_disk:
-					db.write_project_issue_comment_to_disk(repo_name, issue_comment)
+				db.write_project_issue_comment_to_disk(repo_name, issue_comment)
 			lg.step_action()
 		lg.end_action()
 
@@ -87,8 +84,7 @@ def download_repo(repo_address):
 		for issue_event in ghd.download_paginated_object(repo_issue_events_address):
 			if not project.issue_event_exists(issue_event):
 				project.add_project_issue_event(issue_event)
-				if always_write_to_disk:
-					db.write_project_issue_event_to_disk(repo_name, issue_event)
+				db.write_project_issue_event_to_disk(repo_name, issue_event)
 			lg.step_action()
 		lg.end_action()
 
@@ -100,8 +96,7 @@ def download_repo(repo_address):
 				if download_commits_full:
 					commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
 				project.add_project_commit(commit)
-				if always_write_to_disk:
-					db.write_project_commit_to_disk(repo_name, commit)
+				db.write_project_commit_to_disk(repo_name, commit)
 			lg.step_action()
 		lg.end_action()
 
@@ -111,8 +106,7 @@ def download_repo(repo_address):
 		for commit_comment in ghd.download_paginated_object(repo_commit_comments_address):
 			if not project.commit_comment_exists(commit_comment):
 				project.add_project_commit_comment(commit_comment)
-				if always_write_to_disk:
-					db.write_project_commit_comment_to_disk(repo_name, commit_comment)
+				db.write_project_commit_comment_to_disk(repo_name, commit_comment)
 			lg.step_action()
 		lg.end_action()
 
@@ -125,8 +119,7 @@ def download_repo(repo_address):
 			gd.git_pull(git_repo_path)
 		lg.end_action()
 
-	if not always_write_to_disk:
-		db.write_project_to_disk(repo_name, project)
+	db.finalize_write_to_disk(repo_name, project)
 
 def read_file_in_lines(filename):
 	"""
