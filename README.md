@@ -7,8 +7,9 @@ as well as the source code of the repository.
 Prerequisites
 -------------
 To run this tool, you must have a GitHub account. Also, you must create a GitHub personal access token
-(instructions to create one are available [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)) and set it in
-file `properties.py`.
+(instructions to create one are available
+<a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">here</a>)
+and set it in file `properties.py`.
 
 Executing
 ---------
@@ -20,7 +21,7 @@ where `github_repo_url_or_list_of_urls` must be replaced by either one of the fo
 
 The main parameters are the following:
 - `dataFolderPath`: the path where the data will be downloaded (without trailing slash//backslash)
-- `GitHubAuthToken`: your GitHub personal access token (instructions to get one are available [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+- `GitHubAuthToken`: your GitHub personal access token (instructions to get one are available <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">here</a>)
 - `gitExecutablePath`: the path to the git executable in your system
 - `verbose`: controls the messages in the standard output (0 for no messages, 1 for simple messages, and 2 for progress bars)
 
