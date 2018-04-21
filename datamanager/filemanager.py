@@ -25,7 +25,7 @@ class FileManager:
 		:param filename: the filename of the file to be read.
 		:returns: the JSON object that is contained in the file.
 		"""
-		with codecs.open(filename, 'r') as infile:
+		with codecs.open(filename, 'r', 'utf-8') as infile:
 			data = json.load(infile)
 		return data
 

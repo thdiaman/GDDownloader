@@ -70,7 +70,7 @@ class DBManager(FileManager):
 
 	def write_project_issue_event_to_disk(self, repo_name, issue_event):
 		rootfolder = os.path.join(dataFolderPath, repo_name)
-		self.write_json_to_file(os.path.join(rootfolder, "issueComments", str(issue_event["id"]) + ".json"), issue_event)
+		self.write_json_to_file(os.path.join(rootfolder, "issueEvents", str(issue_event["id"]) + ".json"), issue_event)
 
 	def write_project_commit_to_disk(self, repo_name, commit):
 		rootfolder = os.path.join(dataFolderPath, repo_name)
