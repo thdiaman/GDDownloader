@@ -7,7 +7,7 @@ from downloader.githubdownloader import GithubDownloader
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose,\
 	download_issues, download_issue_comments, download_issue_events,\
 	download_commits, download_commit_comments, download_source_code,\
-	always_write_to_disk
+	download_issues_full, download_commits_full, always_write_to_disk
 from logger.downloadlogger import Logger
 
 def get_number_of(gdownloader, repo_api_address, statistic_type, param = None):
@@ -62,7 +62,8 @@ def download_repo(repo_address):
 		repo_issues_address = repo_api_address + "/issues"
 		for issue in ghd.download_paginated_object(repo_issues_address, ["state=all"]):
 			if not project.issue_exists(issue):
-				issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
+				if download_issues_full:
+					issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
 				project.add_project_issue(issue)
 				if always_write_to_disk:
 					db.write_project_issue_to_disk(repo_name, issue)
@@ -96,7 +97,8 @@ def download_repo(repo_address):
 		repo_commits_address = repo_api_address + "/commits"
 		for commit in ghd.download_paginated_object(repo_commits_address):
 			if not project.commit_exists(commit):
-				commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
+				if download_commits_full:
+					commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
 				project.add_project_commit(commit)
 				if always_write_to_disk:
 					db.write_project_commit_to_disk(repo_name, commit)

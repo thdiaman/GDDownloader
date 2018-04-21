@@ -21,3 +21,7 @@ download_issue_events = True
 download_commits = True
 download_commit_comments = True
 download_source_code = False
+
+# Select whether the downloaded issues and commits information will be full
+download_issues_full = True
+download_commits_full = True

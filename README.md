@@ -23,10 +23,20 @@ The main parameters are the following:
 - `GitHubAuthToken`: your GitHub personal access token (instructions to get one are available [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/))
 - `gitExecutablePath`: the path to the git executable in your system
 - `verbose`: controls the messages in the standard output (0 for no messages, 1 for simple messages, and 2 for progress bars)
+- `always_write_to_disk`: controls whether the repository data will be written to disk on download (always) or after fully downloading them
 
 Controlling the output
 ----------------------
 One can also control which data are downloaded by setting the following variables to `True` or `False`:
-`download_issues`, `download_issue_comments`, `download_issue_events`, `download_commits`,
-`download_commit_comments`, and `download_source_code`.
+- `download_issues`
+- `download_issue_comments`
+- `download_issue_events`
+- `download_commits`
+- `download_commit_comments`
+- `download_source_code`
 
+One can also control whether the full information of issues and commits will be downloaded with the variables
+`download_issues_full` and `download_commits_full` respectively. When these variables are set to
+`True`, the issues or commits are downloaded one by one (so that all information is included). If they are
+set to `False`, then they are downloaded in batches (which is faster but not complete - e.g. the closed_by
+field of issues is missing).
