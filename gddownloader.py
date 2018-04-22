@@ -30,10 +30,10 @@ def download_repo(repo_address):
 	project = db.read_project_from_disk(repo_name)
 
 	lg.log_action("Downloading project " + repo_name)
-	if project.project_info_exists():
+	if project.info_exists():
 		lg.log_action("Project already exists! Updating...")
 	project_info = ghd.download_object(repo_api_address)
-	project.add_project_info(project_info)
+	project.add_info(project_info)
 	db.write_project_info_to_disk(repo_name, project["info"])
 
 	lg.start_action("Retrieving project statistics...", 5)
@@ -48,7 +48,7 @@ def download_repo(repo_address):
 	lg.step_action()
 	project_stats["commit_comments"] = get_number_of(ghd, repo_api_address, "comments")
 	lg.step_action()
-	project.add_project_stats(project_stats)
+	project.add_stats(project_stats)
 	lg.end_action()
 	db.write_project_stats_to_disk(repo_name, project["stats"])
 
@@ -59,7 +59,7 @@ def download_repo(repo_address):
 			if not project.issue_exists(issue):
 				if download_issues_full:
 					issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
-				project.add_project_issue(issue)
+				project.add_issue(issue)
 				db.write_project_issue_to_disk(repo_name, issue)
 			lg.step_action()
 		lg.end_action()
@@ -69,7 +69,7 @@ def download_repo(repo_address):
 		repo_issue_comments_address = repo_issues_address + "/comments"
 		for issue_comment in ghd.download_paginated_object(repo_issue_comments_address):
 			if not project.issue_comment_exists(issue_comment):
-				project.add_project_issue_comment(issue_comment)
+				project.add_issue_comment(issue_comment)
 				db.write_project_issue_comment_to_disk(repo_name, issue_comment)
 			lg.step_action()
 		lg.end_action()
@@ -79,7 +79,7 @@ def download_repo(repo_address):
 		repo_issue_events_address = repo_issues_address + "/events"
 		for issue_event in ghd.download_paginated_object(repo_issue_events_address):
 			if not project.issue_event_exists(issue_event):
-				project.add_project_issue_event(issue_event)
+				project.add_issue_event(issue_event)
 				db.write_project_issue_event_to_disk(repo_name, issue_event)
 			lg.step_action()
 		lg.end_action()
@@ -91,7 +91,7 @@ def download_repo(repo_address):
 			if not project.commit_exists(commit):
 				if download_commits_full:
 					commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
-				project.add_project_commit(commit)
+				project.add_commit(commit)
 				db.write_project_commit_to_disk(repo_name, commit)
 			lg.step_action()
 		lg.end_action()
@@ -101,7 +101,7 @@ def download_repo(repo_address):
 		repo_commit_comments_address = repo_api_address + "/comments"
 		for commit_comment in ghd.download_paginated_object(repo_commit_comments_address):
 			if not project.commit_comment_exists(commit_comment):
-				project.add_project_commit_comment(commit_comment)
+				project.add_commit_comment(commit_comment)
 				db.write_project_commit_comment_to_disk(repo_name, commit_comment)
 			lg.step_action()
 		lg.end_action()

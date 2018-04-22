@@ -34,7 +34,7 @@ def print_usage():
 	"""
 	Prints the usage information of this python file.
 	"""
-	print("Usage: python main.py arg")
+	print("Usage: python gddownloader.py arg")
 	print("where arg can be one of the following:")
 	print("   github url (e.g. https://github.com/user/repo)")
 	print("   path to txt file containing github urls")

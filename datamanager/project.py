@@ -4,7 +4,7 @@ class Project(dict):
 	Class that includes the data of a GitHub project. This class is implemented as a dict
 	and includes also several helper functions for adding data and checking for data.
 	"""
-	def project_info_exists(self):
+	def info_exists(self):
 		"""
 		Checks if the info of the project exists.
 
@@ -12,7 +12,7 @@ class Project(dict):
 		"""
 		return bool(self["info"])
 
-	def add_project_info(self, info):
+	def add_info(self, info):
 		"""
 		Adds the info of the repository.
 
@@ -20,7 +20,7 @@ class Project(dict):
 		"""
 		self["info"] = info
 
-	def project_stats_exists(self):
+	def stats_exists(self):
 		"""
 		Checks if the stats of the project exist.
 
@@ -28,7 +28,7 @@ class Project(dict):
 		"""
 		return bool(self["stats"])
 
-	def add_project_stats(self, stats):
+	def add_stats(self, stats):
 		"""
 		Adds the stats of the repository.
 
@@ -45,7 +45,7 @@ class Project(dict):
 		"""
 		return issue["id"] in self["issues"]
 
-	def add_project_issue(self, issue):
+	def add_issue(self, issue):
 		"""
 		Adds an issue to the repository.
 
@@ -62,7 +62,7 @@ class Project(dict):
 		"""
 		return issue_comment["id"] in self["issueComments"]
 
-	def add_project_issue_comment(self, issue_comment):
+	def add_issue_comment(self, issue_comment):
 		"""
 		Adds an issue comment to the repository.
 
@@ -79,7 +79,7 @@ class Project(dict):
 		"""
 		return issue_event["id"] in self["issueEvents"]
 
-	def add_project_issue_event(self, issue_event):
+	def add_issue_event(self, issue_event):
 		"""
 		Adds an issue event to the repository.
 
@@ -96,7 +96,7 @@ class Project(dict):
 		"""
 		return commit["sha"] in self["commits"]
 
-	def add_project_commit(self, commit):
+	def add_commit(self, commit):
 		"""
 		Adds a commit to the repository.
 
@@ -113,7 +113,7 @@ class Project(dict):
 		"""
 		return commit_comment["id"] in self["commitComments"]
 
-	def add_project_commit_comment(self, commit_comment):
+	def add_commit_comment(self, commit_comment):
 		"""
 		Adds a commit comment to the repository.
 

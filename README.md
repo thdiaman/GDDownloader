@@ -13,7 +13,7 @@ and set it in file `properties.py`.
 Executing
 ---------
 To run the tool, one must first correctly assign the properties in file `properties.py`.
-After that, the tool can be executed by running `python main.py [github_repo_url_or_list_of_urls]`,
+After that, the tool can be executed by running `python gddownloader.py [github_repo_url_or_list_of_urls]`,
 where `github_repo_url_or_list_of_urls` must be replaced by either one of the following:
 - a GitHub repo URL (e.g. `https://github.com/thdiaman/GDDownloader`)
 - a list of GitHub repo URLs, as a text file where each file is a GitHub repo URL
