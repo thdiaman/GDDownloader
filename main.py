@@ -1,31 +1,27 @@
 import os
 import sys
-import json
+from logger.downloadlogger import Logger
 from datamanager.dbmanager import DBManager
 from downloader.gitdownloader import GitDownloader
 from downloader.githubdownloader import GithubDownloader
-from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose,\
-	download_issues, download_issue_comments, download_issue_events,\
-	download_commits, download_commit_comments, download_source_code,\
+from helpers import get_number_of, print_usage, read_file_in_lines
+from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose, \
+	download_issues, download_issue_comments, download_issue_events, \
+	download_commits, download_commit_comments, download_source_code, \
 	download_issues_full, download_commits_full
-from logger.downloadlogger import Logger
 
-def get_number_of(gdownloader, repo_api_address, statistic_type, param = None):
-	r = gdownloader.download_request(repo_api_address + "/" + statistic_type, ["per_page=100"] if param == None else ["per_page=100", param])
-	if "link" in r.headers:
-		address = r.headers["link"].split(',')[1].split('<')[1].split('>')[0]
-		data = gdownloader.download_object(address)
-		return 100 * (int(address.split('=')[-1]) - 1) + len(data)
-	else:
-		data = json.loads(r.text or r.content)
-		return len(data)
-
+# Initialize all required objects
 ghd = GithubDownloader(GitHubAuthToken)
 gd = GitDownloader(gitExecutablePath)
 lg = Logger(verbose)
 db = DBManager()
 
 def download_repo(repo_address):
+	"""
+	Downloads all the data of a repository given its GitHub URL.
+
+	:param repo_address: the URL of the repository of which the data are downloaded.
+	"""
 	repo_api_address = "https://api.github.com/repos/" + '/'.join(repo_address.split('/')[-2:])
 	repo_name = '_'.join(repo_address.split('/')[-2:])
 
@@ -120,26 +116,6 @@ def download_repo(repo_address):
 		lg.end_action()
 
 	db.finalize_write_to_disk(repo_name, project)
-
-def read_file_in_lines(filename):
-	"""
-	Reads a file into lines.
-	
-	:param filename: the filename of the file to be read.
-	:returns: a list with the lines of the file.
-	"""
-	with open(filename) as infile:
-		lines = infile.readlines()
-	return lines
-
-def print_usage():
-	"""
-	Prints the usage information of this python file.
-	"""
-	print("Usage: python main.py arg")
-	print("where arg can be one of the following:")
-	print("   github url (e.g. https://github.com/user/repo)")
-	print("   path to txt file containing github urls")
 
 if __name__ == "__main__":
 	if ((not sys.argv) or len(sys.argv) <= 1):

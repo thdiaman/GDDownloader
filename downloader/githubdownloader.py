@@ -12,7 +12,7 @@ class GithubDownloader:
 	def __init__(self, apikey):
 		"""
 		Initializes this GitHub API Downloader.
-		
+
 		:param apikey: the GitHub api key.
 		"""
 		self.remaining_requests = -1
@@ -27,7 +27,7 @@ class GithubDownloader:
 		Sets the current number of requests in the GitHub API, both for simple and for search requests. If the number
 		of remaining requests is less than 100 for API requests or less than 5 for search requests, then this function
 		keeps waiting until the allowed number of requests is reset.
-		
+
 		:param number: the current number of requests to be set.
 		:param resettime: the time until the next renewal of allowed requests.
 		:param is_search: boolean indicating whether the last request was a search request (True) or not (False).
@@ -40,14 +40,14 @@ class GithubDownloader:
 			waitsecs += (20 if is_search else 60)
 			while waitsecs > 0:
 				time.sleep(1)
-				#sys.stdout.write('\rRemaining time: %d seconds' % waitsecs)
+				# sys.stdout.write('\rRemaining time: %d seconds' % waitsecs)
 				waitsecs -= 1
 			sys.stdout.write('\nDone!!')
 
 	def check_credentials(self, credentials):
 		"""
 		Checks whether the credentials are correct.
-		
+
 		:param credentials: the GitHub credentials as a tuple (username, password).
 		:returns: True if the credentials are correct, or False otherwise.
 		"""
@@ -67,7 +67,7 @@ class GithubDownloader:
 	def download_request(self, address, parameters = None, headers = None):
 		"""
 		Implements a download request.
-		
+
 		:param address: the URL of the request.
 		:param parameters: the parameters of the request.
 		:param headers: the headers of the request.
@@ -93,7 +93,7 @@ class GithubDownloader:
 	def download_object(self, address, parameters = None, headers = None):
 		"""
 		Downloads an object of the GitHub API.
-		
+
 		:param address: the URL of the GitHub request.
 		:param parameters: the parameters of the GitHub request.
 		:param headers: the headers of the GitHub request.
@@ -109,7 +109,7 @@ class GithubDownloader:
 	def update_object(self, originalobject, address, parameters = None):
 		"""
 		Updates an object of the GitHub API if it has changed.
-		
+
 		:param originalobject: the original object containing an Etag indicating whether it has changed.
 		:param address: the URL of the GitHub request.
 		:param parameters: the parameters of the GitHub request.
@@ -134,7 +134,7 @@ class GithubDownloader:
 	def download_paginated_object(self, address, parameters = None, headers = None):
 		"""
 		Downloads a paginated object of the GitHub API.
-		
+
 		:param address: the URL of the GitHub request.
 		:param parameters: the parameters of the GitHub request.
 		:param headers: the headers of the GitHub request.
@@ -144,7 +144,7 @@ class GithubDownloader:
 			parameters.append("per_page=100")
 		else:
 			parameters = ["per_page=100"]
-			
+
 		r = self.download_request(address, parameters, headers)
 		if(r.ok):
 			for obj in json.loads(r.text or r.content):

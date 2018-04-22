@@ -3,12 +3,13 @@ import os
 
 class GitDownloader():
 	"""
-	Class that implements a downloader using the git command.
+	Class that implements a downloader using the git command. To use this class, git must
+	be installed in your system.
 	"""
 	def __init__(self, gitcommand):
 		"""
 		Initializes this Git Downloader.
-		
+
 		:param gitcommand: the path to the git command of the system.
 		"""
 		self.gitcommand = gitcommand
@@ -16,7 +17,7 @@ class GitDownloader():
 	def git_pull(self, repo_path):
 		"""
 		Implements the git pull command.
-		
+
 		:param repo_url: the URL of the repository to be pulled.
 		:param repo_path: the path of the repository in the file system.
 		"""
@@ -25,7 +26,7 @@ class GitDownloader():
 	def git_clone(self, repo_url, repo_path):
 		"""
 		Implements the git clone command.
-		
+
 		:param repo_url: the URL of the repository to be cloned.
 		:param repo_path: the path of the file system to clone the repository.
 		"""
@@ -34,7 +35,7 @@ class GitDownloader():
 	def git_repo_exists(self, project_path):
 		"""
 		Checks if the file system contains a project.
-		
+
 		:param project_path: the path of the project to check if it is a git repo.
 		:returns: True if the project has git, or False otherwise.
 		"""
@@ -43,7 +44,7 @@ class GitDownloader():
 	def git_pull_or_clone(self, project_id, repo_url, repo_path, repo_branch):
 		"""
 		Clones a repository or pulls it if it already exists.
-		
+
 		:param project_id: the id of the project to check if it exists in the file system.
 		:param repo_url: the URL of the repository to be cloned or pulled.
 		:param repo_path: the path of the file system to clone or pull the repository.
