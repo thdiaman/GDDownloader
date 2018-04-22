@@ -6,17 +6,21 @@ as well as the source code of the repository.
 
 Prerequisites
 -------------
+The python library requirements are available in file `requirements.txt` and may be installed using
+the command `pip install -r requirements.txt`.
+
 To run this tool, you must have a GitHub account. Also, you must create a GitHub personal access token
 (instructions to create one are available [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/))
 and set it in file `properties.py`.
 
-Executing
----------
+Executing the tool
+------------------
 To run the tool, one must first correctly assign the properties in file `properties.py`.
 After that, the tool can be executed by running `python gddownloader.py [github_repo_url_or_list_of_urls]`,
 where `github_repo_url_or_list_of_urls` must be replaced by either one of the following:
 - a GitHub repo URL (e.g. `https://github.com/thdiaman/GDDownloader`)
 - a list of GitHub repo URLs, as a text file where each file is a GitHub repo URL
+If a repo already exists in the data folder, then its data are updated.
 
 The main parameters are the following:
 - `dataFolderPath`: the path where the data will be downloaded (without trailing slash//backslash)
@@ -25,8 +29,8 @@ The main parameters are the following:
 - `verbose`: controls the messages in the standard output (0 for no messages, 1 for simple messages, and 2 for progress bars)
 - `always_write_to_disk`: controls whether the repository data will be written to disk on download (always) or after fully downloading them
 
-Controlling the output
-----------------------
+Controlling what is downloaded
+------------------------------
 One can also control which data are downloaded by setting the following variables to `True` or `False`:
 - `download_issues`
 - `download_issue_comments`
@@ -40,3 +44,8 @@ One can also control whether the full information of issues and commits will be 
 `True`, the issues or commits are downloaded one by one (so that all information is included). If they are
 set to `False`, then they are downloaded in batches (which is faster but not complete - e.g. the closed_by
 field of issues is missing).
+
+Note that the tool does not account for cases when an issue or a commit has already been downloaded (in either
+full information or in batch mode) and then has to downloaded again. Issues or commits or any other data that
+have already been downloaded are not downloaded again. The tool, however, updates the project when run again for
+the same repository by downloading issues, commits, and generally all data that have not already been downloaded.
