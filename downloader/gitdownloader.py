@@ -1,18 +1,20 @@
-import subprocess
 import os
+import subprocess
 
 class GitDownloader():
 	"""
 	Class that implements a downloader using the git command. To use this class, git must
 	be installed in your system.
 	"""
-	def __init__(self, gitcommand):
+	def __init__(self, gitcommand, logger):
 		"""
 		Initializes this Git Downloader.
 
 		:param gitcommand: the path to the git command of the system.
+		:param logger: a Logger used to print messages from git.
 		"""
 		self.gitcommand = gitcommand
+		self.logger = logger
 
 	def git_pull(self, repo_path):
 		"""
@@ -21,7 +23,13 @@ class GitDownloader():
 		:param repo_url: the URL of the repository to be pulled.
 		:param repo_path: the path of the repository in the file system.
 		"""
-		subprocess.call([self.gitcommand, 'pull'], cwd = repo_path)
+		p = subprocess.Popen([self.gitcommand, 'pull'], cwd = repo_path, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+		while True:
+			line = p.stdout.readline()
+			if line != b'':
+				self.logger.log_action(line.decode('utf-8'))
+			else:
+				break
 
 	def git_clone(self, repo_url, repo_path):
 		"""
@@ -30,7 +38,13 @@ class GitDownloader():
 		:param repo_url: the URL of the repository to be cloned.
 		:param repo_path: the path of the file system to clone the repository.
 		"""
-		subprocess.call([self.gitcommand, 'clone', repo_url, repo_path])
+		p = subprocess.Popen([self.gitcommand, 'clone', repo_url, repo_path], stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+		while True:
+			line = p.stdout.readline()
+			if line != b'':
+				self.logger.log_action(line.decode('utf-8'))
+			else:
+				break
 
 	def git_repo_exists(self, project_path):
 		"""

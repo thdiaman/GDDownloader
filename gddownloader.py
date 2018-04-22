@@ -11,10 +11,10 @@ from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbo
 	download_issues_full, download_commits_full
 
 # Initialize all required objects
-ghd = GithubDownloader(GitHubAuthToken)
-gd = GitDownloader(gitExecutablePath)
-lg = Logger(verbose)
 db = DBManager()
+lg = Logger(verbose)
+ghd = GithubDownloader(GitHubAuthToken)
+gd = GitDownloader(gitExecutablePath, lg)
 
 def download_repo(repo_address):
 	"""
