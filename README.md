@@ -2,7 +2,8 @@ GDDownloader: GitHub Data Downloader
 ====================================
 GDDownloader is a data downloader for the GitHub API. The tool allows to download all information
 offered for a repository, including commits, issues, commit comments, issue comments, issue events,
-as well as the source code of the repository.
+as well as the source code of the repository. The tool uses the GitHub API v3, for which more
+information can be found [here](https://developer.github.com/v3/).
 
 Prerequisites
 -------------
