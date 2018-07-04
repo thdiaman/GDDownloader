@@ -5,7 +5,7 @@ import codecs
 class FileManager:
 	"""
 	Class that implements a file manager. It includes functions for creating, reading, and
-	writing from and to folders and JSON files. Note that all data is read and written in
+	writing from and to folders and JSON files. Note that all data are read and written in
 	UTF-8 encoding.
 	"""
 	def create_folder_if_it_does_not_exist(self, foldername):

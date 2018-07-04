@@ -132,7 +132,7 @@ if __name__ == "__main__":
 	elif(os.path.exists(sys.argv[1])):
 		repos = read_file_in_lines(sys.argv[1])
 		for repo in repos:
-			download_repo(sys.argv[1])
+			download_repo(repo)
 	else:
 		print_usage()
 
