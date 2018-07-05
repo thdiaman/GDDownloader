@@ -121,3 +121,20 @@ class Project(dict):
 		"""
 		self["commitComments"][commit_comment["id"]] = commit_comment
 
+	def contributor_exists(self, contributor):
+		"""
+		Checks if the given commit comment exists in the project.
+
+		:param contributor: the commit comment to be checked.
+		:returns: True if the given commit comment exists in the project, or False otherwise.
+		"""
+		return contributor["id"] in self["contributors"]
+
+	def add_contributor(self, contributor):
+		"""
+		Adds a commit comment to the repository.
+
+		:param contributor: the commit comment to be added to the repository.
+		"""
+		self["contributors"][contributor["id"]] = contributor
+

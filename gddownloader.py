@@ -9,7 +9,7 @@ from helpers import get_number_of, print_usage, read_file_in_lines
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose, \
 	download_issues, download_issue_comments, download_issue_events, \
 	download_commits, download_commit_comments, download_source_code, \
-	download_issues_full, download_commits_full
+	download_issues_full, download_commits_full, download_contributors
 
 # Initialize all required objects
 db = DBManager()
@@ -38,7 +38,7 @@ def download_repo(repo_address):
 		project.add_info(project_info)
 		db.write_project_info_to_disk(repo_name, project["info"])
 	
-		lg.start_action("Retrieving project statistics...", 5)
+		lg.start_action("Retrieving project statistics...", 6)
 		project_stats = {}
 		project_stats["issues"] = get_number_of(ghd, repo_api_address, "issues", "state=all")
 		lg.step_action()
@@ -49,6 +49,8 @@ def download_repo(repo_address):
 		project_stats["commits"] = get_number_of(ghd, repo_api_address, "commits")
 		lg.step_action()
 		project_stats["commit_comments"] = get_number_of(ghd, repo_api_address, "comments")
+		lg.step_action()
+		project_stats["contributors"] = get_number_of(ghd, repo_api_address, "contributors")
 		lg.step_action()
 		project.add_stats(project_stats)
 		lg.end_action()
@@ -105,6 +107,16 @@ def download_repo(repo_address):
 				if not project.commit_comment_exists(commit_comment):
 					project.add_commit_comment(commit_comment)
 					db.write_project_commit_comment_to_disk(repo_name, commit_comment)
+				lg.step_action()
+			lg.end_action()
+	
+		if download_contributors:
+			lg.start_action("Retrieving contributors...", project_stats["contributors"])
+			repo_contributors_address = repo_api_address + "/contributors"
+			for contributor in ghd.download_paginated_object(repo_contributors_address):
+				if not project.contributor_exists(contributor):
+					project.add_contributor(contributor)
+					db.write_project_contributor_to_disk(repo_name, contributor)
 				lg.step_action()
 			lg.end_action()
 	

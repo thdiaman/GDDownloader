@@ -28,6 +28,7 @@ class DBManager(FileManager):
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "issueEvents"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commits"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commitComments"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "contributors"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "sourcecode"))
 
 	def read_project_from_disk(self, repo_name):
@@ -47,6 +48,7 @@ class DBManager(FileManager):
 		project["issueEvents"] = self.read_jsons_from_folder(os.path.join(rootfolder, "issueEvents"), "id")
 		project["commits"] = self.read_jsons_from_folder(os.path.join(rootfolder, "commits"), "sha")
 		project["commitComments"] = self.read_jsons_from_folder(os.path.join(rootfolder, "commitComments"), "id")
+		project["contributors"] = self.read_jsons_from_folder(os.path.join(rootfolder, "contributors"), "id")
 		return project
 
 	def finalize_write_to_disk(self, repo_name, project):
@@ -70,6 +72,8 @@ class DBManager(FileManager):
 				self.write_json_to_file(os.path.join(rootfolder, "commits", str(commit["sha"]) + ".json"), commit)
 			for commit_comment in project["commitComments"].values():
 				self.write_json_to_file(os.path.join(rootfolder, "commitComments", str(commit_comment["id"]) + ".json"), commit_comment)
+			for contributor in project["contributors"].values():
+				self.write_json_to_file(os.path.join(rootfolder, "contributors", str(contributor["id"]) + ".json"), contributor)
 
 	def write_project_info_to_disk(self, repo_name, info):
 		"""
@@ -147,4 +151,15 @@ class DBManager(FileManager):
 		if always_write_to_disk:
 			rootfolder = os.path.join(dataFolderPath, repo_name)
 			self.write_json_to_file(os.path.join(rootfolder, "commitComments", str(commit_comment["id"]) + ".json"), commit_comment)
+
+	def write_project_contributor_to_disk(self, repo_name, contributor):
+		"""
+		Writes a contributor of a repository to disk.
+
+		:param repo_name: the name of the repository.
+		:param contributor: the contributor to be written to disk.
+		"""
+		if always_write_to_disk:
+			rootfolder = os.path.join(dataFolderPath, repo_name)
+			self.write_json_to_file(os.path.join(rootfolder, "contributors", str(contributor["id"]) + ".json"), contributor)
 
