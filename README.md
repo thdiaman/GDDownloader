@@ -38,6 +38,7 @@ One can also control which data are downloaded by setting the following variable
 - `download_issue_events`
 - `download_commits`
 - `download_commit_comments`
+- `download_contributors`
 - `download_source_code`
 
 One can also control whether the full information of issues and commits will be downloaded with the variables
