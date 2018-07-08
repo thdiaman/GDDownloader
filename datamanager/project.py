@@ -45,6 +45,18 @@ class Project(dict):
 		"""
 		return issue["id"] in self["issues"]
 
+	def full_issue_exists(self, issue):
+		"""
+		Checks if the given issue exists in the project in its full version (including closed_by).
+
+		:param issue: the issue to be checked.
+		:returns: True if the given issue exists in the project, or False otherwise.
+		"""
+		if issue["id"] in self["issues"]:
+			return "closed_by" in self["issues"][issue["id"]]
+		else:
+			return False
+
 	def add_issue(self, issue):
 		"""
 		Adds an issue to the repository.
@@ -95,6 +107,15 @@ class Project(dict):
 		:returns: True if the given commit exists in the project, or False otherwise.
 		"""
 		return commit["sha"] in self["commits"]
+
+	def full_commit_exists(self, commit):
+		"""
+		Checks if the given commit exists in the project in its full version (including stats and files).
+
+		:param commit: the commit to be checked.
+		:returns: True if the given commit exists in the project, or False otherwise.
+		"""
+		return commit["sha"] in self["commits"] and "stats" in self["commits"][commit["sha"]]
 
 	def add_commit(self, commit):
 		"""

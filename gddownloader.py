@@ -62,9 +62,20 @@ def download_repo(repo_address):
 			for issue in ghd.download_paginated_object(repo_issues_address, ["state=all"]):
 				if not project.issue_exists(issue):
 					if download_issues_full:
-						issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
+						if issue["state"] == "closed":
+							issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
+						else:
+							issue["closed_by"] = None
 					project.add_issue(issue)
 					db.write_project_issue_to_disk(repo_name, issue)
+				else:
+					if download_issues_full and not project.full_issue_exists(issue):
+						if issue["state"] == "closed":
+							issue = ghd.download_object(repo_issues_address + "/" + str(issue["number"]))
+						else:
+							issue["closed_by"] = None
+						project.add_issue(issue)
+						db.write_project_issue_to_disk(repo_name, issue)
 				lg.step_action()
 			lg.end_action()
 	
@@ -97,6 +108,11 @@ def download_repo(repo_address):
 						commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
 					project.add_commit(commit)
 					db.write_project_commit_to_disk(repo_name, commit)
+				else:
+					if download_commits_full and not project.full_commit_exists(commit):
+						commit = ghd.download_object(repo_commits_address + "/" + str(commit["sha"]))
+						project.add_commit(commit)
+						db.write_project_commit_to_disk(repo_name, commit)
 				lg.step_action()
 			lg.end_action()
 	
