@@ -151,8 +151,17 @@ class GithubDownloader:
 				yield obj
 		while True:
 			try:
-				relnext = str(r.headers['Link'])[1:].split('>')[0]
-				is_relnext = str(r.headers['Link']).split("\"")[1] == "next"
+				links = {}
+				for link in r.headers['Link'].split(", "):
+					linkaddress, linktype = link.split("; ")
+					linkaddress = linkaddress[1:-1]
+					linktype = linktype.split("\"")[1]
+					links[linktype] = linkaddress
+				if "next" in links:
+					relnext = links["next"]
+					is_relnext = True
+				else:
+					is_relnext = False
 			except (KeyError, ValueError):
 				break
 			if is_relnext:
