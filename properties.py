@@ -5,6 +5,9 @@ dataFolderPath = 'data'
 # Set this to your GitHub auth token
 GitHubAuthToken = 'add_here_your_token'
 
+# Set this to true to download also private repos if the token has private repo rights 
+include_private_repos = False
+
 # Set this to the path of the git executable
 gitExecutablePath = 'git'
 

@@ -1,20 +1,23 @@
 import os
 import subprocess
+from properties import include_private_repos
 
 class GitDownloader():
 	"""
 	Class that implements a downloader using the git command. To use this class, git must
 	be installed in your system.
 	"""
-	def __init__(self, gitcommand, logger):
+	def __init__(self, gitcommand, logger, apikey):
 		"""
 		Initializes this Git Downloader.
 
 		:param gitcommand: the path to the git command of the system.
 		:param logger: a Logger used to print messages from git.
+		:param apikey: the GitHub api key, required only to clone/pull private repos.
 		"""
 		self.gitcommand = gitcommand
 		self.logger = logger
+		self.apikey = apikey
 
 	def git_pull(self, repo_path):
 		"""
@@ -38,6 +41,8 @@ class GitDownloader():
 		:param repo_url: the URL of the repository to be cloned.
 		:param repo_path: the path of the file system to clone the repository.
 		"""
+		if include_private_repos:
+			repo_url = repo_url.replace('https://github.com', 'https://' + self.apikey + '@github.com')
 		p = subprocess.Popen([self.gitcommand, 'clone', repo_url, repo_path], stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
 		while True:
 			line = p.stdout.readline()

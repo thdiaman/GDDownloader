@@ -15,7 +15,7 @@ from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbo
 db = DBManager()
 lg = Logger(verbose)
 ghd = GithubDownloader(GitHubAuthToken)
-gd = GitDownloader(gitExecutablePath, lg)
+gd = GitDownloader(gitExecutablePath, lg, GitHubAuthToken)
 
 def download_repo(repo_address):
 	"""

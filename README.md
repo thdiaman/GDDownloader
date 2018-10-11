@@ -12,7 +12,9 @@ the command `pip install -r requirements.txt`.
 
 To run this tool, you must have a GitHub account. Also, you must create a GitHub personal access token
 (instructions to create one are available [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/))
-and set it in file `properties.py`.
+and set it in file `properties.py`. Note that if you also want to access your private repositories you
+have to edit the created personal access token and select the repo scope (i.e. Full control of private repositories), and then
+you also have to set the variable `include_private_repos` in file `properties.py` to `True`.
 
 Executing the tool
 ------------------
