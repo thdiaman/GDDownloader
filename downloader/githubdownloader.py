@@ -32,8 +32,8 @@ class GithubDownloader:
 		:param resettime: the time until the next renewal of allowed requests.
 		:param is_search: boolean indicating whether the last request was a search request (True) or not (False).
 		"""
-		self.remaining_requests = int(number)
-		self.resettime = datetime.datetime.fromtimestamp(float(resettime)).strftime('%H:%M')
+		self.remaining_requests = int(number) if number != None else self.remaining_requests - 1
+		self.resettime = datetime.datetime.fromtimestamp(float(resettime)).strftime('%H:%M') if resettime != None else self.resettime
 		if (is_search and self.remaining_requests < 5) or ((not is_search) and self.remaining_requests < 100):
 			sys.stdout.write('\nOops! You have exceeded the requests limit!\nYou have to wait until ' + self.resettime + '..\n')
 			waitsecs = int(resettime) - int(time.time())
@@ -85,7 +85,8 @@ class GithubDownloader:
 					headers = {}
 				headers['Authorization'] = 'token ' + self.credentials
 				r = requests.get(address + parameters, headers = headers)
-				self.set_request_number(r.headers['x-ratelimit-remaining'], r.headers['x-ratelimit-reset'], "api.github.com/search" in address)
+				self.set_request_number(r.headers['x-ratelimit-remaining'] if 'x-ratelimit-remaining' in r.headers else None, \
+										r.headers['x-ratelimit-reset']  if 'x-ratelimit-reset' in r.headers else None, "api.github.com/search" in address)
 				return r
 			except TimeoutError:
 				return None
