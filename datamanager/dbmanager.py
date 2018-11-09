@@ -51,6 +51,16 @@ class DBManager(FileManager):
 		project["contributors"] = self.read_jsons_from_folder(os.path.join(rootfolder, "contributors"), "id")
 		return project
 
+	def project_exists(self, repo_name):
+		"""
+		Check if a project exists in the disk given the name of the repository that is also the folder
+		of the project. The existence of the project is determined by whether it has an info.json file
+
+		:param repo_name: the name of the repository to be read from disk.
+		:returns: True if the project exists, or False otherwise.
+		"""
+		return os.path.exists(os.path.join(dataFolderPath, repo_name, "info.json"))
+
 	def finalize_write_to_disk(self, repo_name, project):
 		"""
 		Finalizes the writing of a project to disk. Closes any open buffers.

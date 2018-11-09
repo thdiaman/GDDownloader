@@ -29,6 +29,7 @@ The main parameters are the following:
 - `dataFolderPath`: the path where the data will be downloaded (without trailing slash//backslash)
 - `GitHubAuthToken`: your GitHub personal access token (instructions to get one are available [here](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/))
 - `gitExecutablePath`: the path to the git executable in your system
+- `update_existing_repos`: controls whether the existing (already downloaded) repositories will be updated or skipped
 - `verbose`: controls the messages in the standard output (0 for no messages, 1 for simple messages, and 2 for progress bars)
 - `always_write_to_disk`: controls whether the repository data will be written to disk on download (always) or after fully downloading them
 

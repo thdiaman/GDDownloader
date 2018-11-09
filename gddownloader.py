@@ -9,7 +9,8 @@ from helpers import get_number_of, print_usage, read_file_in_lines
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose, \
 	download_issues, download_issue_comments, download_issue_events, \
 	download_commits, download_commit_comments, download_source_code, \
-	download_issues_full, download_commits_full, download_contributors
+	download_issues_full, download_commits_full, download_contributors, \
+	update_existing_repos
 
 # Initialize all required objects
 db = DBManager()
@@ -26,14 +27,19 @@ def download_repo(repo_address):
 	repo_api_address = "https://api.github.com/repos/" + '/'.join(repo_address.split('/')[-2:])
 	repo_name = '_'.join(repo_address.split('/')[-2:])
 
+	lg.log_action("Downloading project " + repo_name)
+	if db.project_exists(repo_name):
+		if update_existing_repos:
+			lg.log_action("Project already exists! Updating...")
+		else:
+			lg.log_action("Project already exists! Skipping...")
+			return
+
 	db.initialize_write_to_disk(repo_name)
 
 	project = db.read_project_from_disk(repo_name)
 
 	try:
-		lg.log_action("Downloading project " + repo_name)
-		if project.info_exists():
-			lg.log_action("Project already exists! Updating...")
 		project_info = ghd.download_object(repo_api_address)
 		project.add_info(project_info)
 		db.write_project_info_to_disk(repo_name, project["info"])

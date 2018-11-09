@@ -11,6 +11,9 @@ include_private_repos = False
 # Set this to the path of the git executable
 gitExecutablePath = 'git'
 
+# Set this to False to skip existing repos
+update_existing_repos = True
+
 # Set to 0 for no messages, 1 for simple messages, and 2 for progress bars
 verbose = 1
 
