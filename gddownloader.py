@@ -4,16 +4,17 @@ import traceback
 from logger.downloadlogger import Logger
 from datamanager.dbmanager import DBManager
 from downloader.gitdownloader import GitDownloader
+from datamanager.mongomanager import MongoDBManager
 from downloader.githubdownloader import GithubDownloader
 from helpers import get_number_of, print_usage, read_file_in_lines
 from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbose, \
 	download_issues, download_issue_comments, download_issue_events, \
 	download_commits, download_commit_comments, download_source_code, \
 	download_issues_full, download_commits_full, download_contributors, \
-	update_existing_repos
+	update_existing_repos, use_database
 
 # Initialize all required objects
-db = DBManager()
+db = MongoDBManager() if use_database == 'mongo' else DBManager()
 lg = Logger(verbose)
 ghd = GithubDownloader(GitHubAuthToken)
 gd = GitDownloader(gitExecutablePath, lg, GitHubAuthToken)
@@ -43,7 +44,7 @@ def download_repo(repo_address):
 		project_info = ghd.download_object(repo_api_address)
 		project.add_info(project_info)
 		db.write_project_info_to_disk(repo_name, project["info"])
-	
+
 		lg.start_action("Retrieving project statistics...", 6)
 		project_stats = {}
 		project_stats["issues"] = get_number_of(ghd, repo_api_address, "issues", "state=all")
@@ -60,8 +61,8 @@ def download_repo(repo_address):
 		lg.step_action()
 		project.add_stats(project_stats)
 		lg.end_action()
-		db.write_project_stats_to_disk(repo_name, project["stats"])
-	
+		db.write_project_stats_to_disk(repo_name, project["info"], project["stats"])
+
 		if download_issues:
 			lg.start_action("Retrieving issues...", project_stats["issues"])
 			repo_issues_address = repo_api_address + "/issues"
@@ -84,7 +85,7 @@ def download_repo(repo_address):
 						db.write_project_issue_to_disk(repo_name, issue)
 				lg.step_action()
 			lg.end_action()
-	
+
 		if download_issue_comments:
 			lg.start_action("Retrieving issue comments...", project_stats["issue_comments"])
 			repo_issue_comments_address = repo_issues_address + "/comments"
@@ -94,7 +95,7 @@ def download_repo(repo_address):
 					db.write_project_issue_comment_to_disk(repo_name, issue_comment)
 				lg.step_action()
 			lg.end_action()
-	
+
 		if download_issue_events:
 			lg.start_action("Retrieving issue events...", project_stats["issue_events"])
 			repo_issue_events_address = repo_issues_address + "/events"
@@ -104,7 +105,7 @@ def download_repo(repo_address):
 					db.write_project_issue_event_to_disk(repo_name, issue_event)
 				lg.step_action()
 			lg.end_action()
-	
+
 		if download_commits:
 			lg.start_action("Retrieving commits...", project_stats["commits"])
 			repo_commits_address = repo_api_address + "/commits"
@@ -121,7 +122,7 @@ def download_repo(repo_address):
 						db.write_project_commit_to_disk(repo_name, commit)
 				lg.step_action()
 			lg.end_action()
-	
+
 		if download_commit_comments:
 			lg.start_action("Retrieving commit comments...", project_stats["commit_comments"])
 			repo_commit_comments_address = repo_api_address + "/comments"
@@ -131,7 +132,7 @@ def download_repo(repo_address):
 					db.write_project_commit_comment_to_disk(repo_name, commit_comment)
 				lg.step_action()
 			lg.end_action()
-	
+
 		if download_contributors:
 			lg.start_action("Retrieving contributors...", project_stats["contributors"])
 			repo_contributors_address = repo_api_address + "/contributors"
@@ -141,7 +142,7 @@ def download_repo(repo_address):
 					db.write_project_contributor_to_disk(repo_name, contributor)
 				lg.step_action()
 			lg.end_action()
-	
+
 		if download_source_code:
 			lg.start_action("Retrieving source code...")
 			git_repo_path = os.path.join(dataFolderPath, repo_name, "sourcecode")

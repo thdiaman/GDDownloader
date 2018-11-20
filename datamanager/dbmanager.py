@@ -54,7 +54,7 @@ class DBManager(FileManager):
 	def project_exists(self, repo_name):
 		"""
 		Check if a project exists in the disk given the name of the repository that is also the folder
-		of the project. The existence of the project is determined by whether it has an info.json file
+		of the project. The existence of the project is determined by whether it has an info.json file.
 
 		:param repo_name: the name of the repository to be read from disk.
 		:returns: True if the project exists, or False otherwise.
@@ -96,11 +96,12 @@ class DBManager(FileManager):
 			rootfolder = os.path.join(dataFolderPath, repo_name)
 			self.write_json_to_file(os.path.join(rootfolder, "info.json"), info)
 
-	def write_project_stats_to_disk(self, repo_name, stats):
+	def write_project_stats_to_disk(self, repo_name, info, stats):  # @UnusedVariable
 		"""
 		Writes the stats of a repository to disk.
 
 		:param repo_name: the name of the repository.
+		:param info: the info of the project.
 		:param stats: the stats to be written to disk.
 		"""
 		if always_write_to_disk:
