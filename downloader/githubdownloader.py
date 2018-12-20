@@ -102,7 +102,7 @@ class GithubDownloader:
 		"""
 		r = self.download_request(address, parameters, headers)
 		if r.ok:
-			content = json.loads(r.text or r.content)
+			content = json.loads(r.text or r.content) if r.status_code != 204 else {}
 			if type(content) == dict and 'ETag' in r.headers:
 				content['ETag'] = r.headers['ETag']
 			return content  # if not isinstance(content, list) else content[0]
@@ -147,7 +147,7 @@ class GithubDownloader:
 			parameters = ["per_page=100"]
 
 		r = self.download_request(address, parameters, headers)
-		if(r.ok):
+		if r.ok and r.status_code != 204:
 			for obj in json.loads(r.text or r.content):
 				yield obj
 		while True:
@@ -169,6 +169,6 @@ class GithubDownloader:
 				r = self.download_request(relnext, [], headers)
 			else:
 				break
-			if(r.ok):
+			if r.ok and r.status_code != 204:
 				for obj in json.loads(r.text or r.content):
 					yield obj

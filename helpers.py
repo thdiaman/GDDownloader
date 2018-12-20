@@ -16,7 +16,7 @@ def get_number_of(gdownloader, repo_api_address, statistic_type, parameter = Non
 		data = gdownloader.download_object(address)
 		return 100 * (int(address.split('=')[-1]) - 1) + len(data) if data != None else None
 	else:
-		data = json.loads(r.text or r.content)
+		data = json.loads(r.text or r.content) if r.status_code != 204 else {}
 		return len(data)
 
 def read_file_in_lines(filename):
