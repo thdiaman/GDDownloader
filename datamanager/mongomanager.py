@@ -81,6 +81,7 @@ class MongoDBManager(DatabaseManager, FileManager):
 			project["info"]["repo_name"] = repo_name
 			self.projects.update_one({"_id": project["info"]["_id"]}, {"$set": project["info"]}, upsert = True)
 			project["stats"]["_id"] = project["info"]["id"]
+			project["stats"]["repo_name"] = repo_name
 			self.stats.update_one({"_id": project["stats"]["_id"]}, {"$set": project["stats"]}, upsert = True)
 			for issue in project["issues"].values():
 				issue["_id"] = issue["id"]
