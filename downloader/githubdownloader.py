@@ -148,8 +148,12 @@ class GithubDownloader:
 
 		r = self.download_request(address, parameters, headers)
 		if r.ok and r.status_code != 204:
-			for obj in json.loads(r.text or r.content):
-				yield obj
+			if "api.github.com/search" in address:
+				for obj in json.loads(r.text or r.content)["items"]:
+					yield obj
+			else:
+				for obj in json.loads(r.text or r.content):
+					yield obj
 		while True:
 			try:
 				links = {}
@@ -170,5 +174,9 @@ class GithubDownloader:
 			else:
 				break
 			if r.ok and r.status_code != 204:
-				for obj in json.loads(r.text or r.content):
-					yield obj
+				if "api.github.com/search" in address:
+					for obj in json.loads(r.text or r.content)["items"]:
+						yield obj
+				else:
+					for obj in json.loads(r.text or r.content):
+						yield obj
