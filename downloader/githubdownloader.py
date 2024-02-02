@@ -4,6 +4,7 @@ import time
 import datetime
 import requests
 from urllib3.exceptions import TimeoutError
+from requests.exceptions import ConnectionError
 
 class GithubDownloader:
 	"""
@@ -88,7 +89,7 @@ class GithubDownloader:
 				self.set_request_number(r.headers['x-ratelimit-remaining'] if 'x-ratelimit-remaining' in r.headers else None, \
 										r.headers['x-ratelimit-reset']  if 'x-ratelimit-reset' in r.headers else None, "api.github.com/search" in address)
 				return r
-			except TimeoutError:
+			except TimeoutError or ConnectionError:
 				return None
 
 	def download_object(self, address, parameters = None, headers = None):
