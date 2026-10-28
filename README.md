@@ -56,15 +56,19 @@ One can also control which data are downloaded by setting the following variable
 - `download_commits`
 - `download_commit_comments`
 - `download_contributors`
+- `download_milestones`
+- `download_releases`
+- `download_pull_requests`
+- `download_pull_request_comments`
 - `download_source_code`
 
-One can also control whether the full information of issues and commits will be downloaded with the variables
-`download_issues_full` and `download_commits_full` respectively. When these variables are set to
-`True`, the issues or commits are downloaded one by one (so that all information is included). If they are
+One can also control whether the full information of issues, commits and pull requests will be downloaded with the variables
+`download_issues_full`, `download_commits_full` and `download_pull_requests_full` respectively. When these variables are set to
+`True`, the issues or commits or pull requests are downloaded one by one (so that all information is included). If they are
 set to `False`, then they are downloaded in batches (which is faster but not complete - e.g. the closed_by
 field of issues is missing).
 
-Note that the tool does not account for cases when an issue or a commit has already been downloaded (in either
-full information or in batch mode) and then has to be downloaded again. Issues or commits or any other data that
+Note that the tool does not account for cases when an issue or a commit or a pull request has already been downloaded (in either
+full information or in batch mode) and then has to be downloaded again. Issues or commits or pull requests or any other data that
 have already been downloaded are not downloaded again. The tool, however, updates the project when run again for
-the same repository by downloading issues, commits, and generally all data that have not already been downloaded.
+the same repository by downloading issues, commits, pull requests, and generally all data that have not already been downloaded.

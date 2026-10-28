@@ -11,7 +11,9 @@ from properties import GitHubAuthToken, dataFolderPath, gitExecutablePath, verbo
 	download_issues, download_issue_comments, download_issue_events, \
 	download_commits, download_commit_comments, download_source_code, \
 	download_issues_full, download_commits_full, download_contributors, \
-	update_existing_repos, use_database
+	update_existing_repos, use_database, download_pull_requests,\
+	download_pulls_full, download_pull_request_comments,\
+	download_milestones, download_releases
 
 # Initialize all required objects
 db = MongoDBManager() if use_database == 'mongo' else DBManager()
@@ -58,6 +60,14 @@ def download_repo(repo_address):
 		project_stats["commit_comments"] = get_number_of(ghd, repo_api_address, "comments")
 		lg.step_action()
 		project_stats["contributors"] = get_number_of(ghd, repo_api_address, "contributors")
+		lg.step_action()
+		project_stats["milestones"] = get_number_of(ghd, repo_api_address, "milestones")
+		lg.step_action()
+		project_stats["releases"] = get_number_of(ghd, repo_api_address, "releases")
+		lg.step_action()
+		project_stats["pulls"] = get_number_of(ghd, repo_api_address, "pulls", "state=all")
+		lg.step_action()
+		project_stats["pull_comments"] = get_number_of(ghd, repo_api_address, "pull/comments")
 		lg.step_action()
 		project.add_stats(project_stats)
 		lg.end_action()
@@ -140,6 +150,61 @@ def download_repo(repo_address):
 				if not project.contributor_exists(contributor):
 					project.add_contributor(contributor)
 					db.write_project_contributor_to_disk(repo_name, contributor)
+				lg.step_action()
+			lg.end_action()
+
+		if download_milestones:
+			lg.start_action("Retrieving milestones...", project_stats["milestones"])
+			repo_milestones_address = repo_api_address + "/milestones"
+			for milestone in ghd.download_paginated_object(repo_milestones_address):
+				if not project.milestone_exists(milestone):
+					project.add_milestone(milestone)
+					db.write_project_milestone_to_disk(repo_name, milestone)
+				lg.step_action()
+			lg.end_action()
+
+		if download_releases:
+			lg.start_action("Retrieving releases...", project_stats["releases"])
+			repo_releases_address = repo_api_address + "/releases"
+			for release in ghd.download_paginated_object(repo_releases_address):
+				if not project.release_exists(release):
+					project.add_release(release)
+					db.write_project_release_to_disk(repo_name, release)
+				lg.step_action()
+			lg.end_action()
+
+		if download_pull_requests:
+			lg.start_action("Retrieving pull requests...", project_stats["pulls"])
+			repo_pulls_address = repo_api_address + "/pulls"
+			for pull in ghd.download_paginated_object(repo_pulls_address, ["state=all"]):
+				if not project.pull_exists(pull):
+					if download_pulls_full:
+						if "merged_at" != None:
+							pull = ghd.download_object(repo_pulls_address + "/" + str(pull["number"]))
+						else:
+							pull["merged"] = False
+							pull["merged_by"] = None
+					project.add_pull(pull)
+					db.write_project_pull_to_disk(repo_name, pull)
+				else:
+					if download_pulls_full and not project.full_pull_exists(pull):
+						if "merged_at" != None:
+							pull = ghd.download_object(repo_pulls_address + "/" + str(pull["number"]))
+						else:
+							pull["merged"] = False
+							pull["merged_by"] = None
+						project.add_pull(pull)
+						db.write_project_pull_to_disk(repo_name, pull)
+				lg.step_action()
+			lg.end_action()
+
+		if download_pull_request_comments:
+			lg.start_action("Retrieving issue pull request comments...", project_stats["pull_comments"])
+			repo_pull_comments_address = repo_pulls_address + "/comments"
+			for pull_comment in ghd.download_paginated_object(repo_pull_comments_address):
+				if not project.pull_comment_exists(pull_comment):
+					project.add_pull_comment(pull_comment)
+					db.write_project_pull_comment_to_disk(repo_name, pull_comment)
 				lg.step_action()
 			lg.end_action()
 

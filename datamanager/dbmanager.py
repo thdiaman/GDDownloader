@@ -29,6 +29,10 @@ class DBManager(FileManager):
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commits"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "commitComments"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "contributors"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "milestones"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "releases"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "pulls"))
+		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "pullComments"))
 		self.create_folder_if_it_does_not_exist(os.path.join(rootfolder, "sourcecode"))
 
 	def read_project_from_disk(self, repo_name):
@@ -49,6 +53,10 @@ class DBManager(FileManager):
 		project["commits"] = self.read_jsons_from_folder(os.path.join(rootfolder, "commits"), "sha")
 		project["commitComments"] = self.read_jsons_from_folder(os.path.join(rootfolder, "commitComments"), "id")
 		project["contributors"] = self.read_jsons_from_folder(os.path.join(rootfolder, "contributors"), "id")
+		project["milestones"] = self.read_jsons_from_folder(os.path.join(rootfolder, "milestones"), "id")
+		project["releases"] = self.read_jsons_from_folder(os.path.join(rootfolder, "releases"), "id")
+		project["pulls"] = self.read_jsons_from_folder(os.path.join(rootfolder, "pulls"), "id")
+		project["pullComments"] = self.read_jsons_from_folder(os.path.join(rootfolder, "pullComments"), "id")
 		return project
 
 	def project_exists(self, repo_name):
@@ -84,6 +92,14 @@ class DBManager(FileManager):
 				self.write_json_to_file(os.path.join(rootfolder, "commitComments", str(commit_comment["id"]) + ".json"), commit_comment)
 			for contributor in project["contributors"].values():
 				self.write_json_to_file(os.path.join(rootfolder, "contributors", str(contributor["id"]) + ".json"), contributor)
+			for pull in project["pulls"].values():
+				self.write_json_to_file(os.path.join(rootfolder, "pulls", str(pull["id"]) + ".json"), pull)
+			for pull_review in project["pulls"].values():
+				self.write_json_to_file(os.path.join(rootfolder, "pullReviews", str(pull_review["id"]) + ".json"), pull_review)
+			for pull_comment in project["pulls"].values():
+				self.write_json_to_file(os.path.join(rootfolder, "pullComments", str(pull_comment["id"]) + ".json"), pull_comment)
+			for pull_commit in project["pulls"].values():
+				self.write_json_to_file(os.path.join(rootfolder, "pullCommits", str(pull_commit["sha"]) + ".json"), pull_commit)
 
 	def write_project_info_to_disk(self, repo_name, info):
 		"""
@@ -173,4 +189,48 @@ class DBManager(FileManager):
 		if always_write_to_disk:
 			rootfolder = os.path.join(dataFolderPath, repo_name)
 			self.write_json_to_file(os.path.join(rootfolder, "contributors", str(contributor["id"]) + ".json"), contributor)
+
+	def write_project_milestone_to_disk(self, repo_name, milestone):
+		"""
+		Writes a milestone of a repository to disk.
+
+		:param repo_name: the name of the repository.
+		:param milestone: the milestone to be written to disk.
+		"""
+		if always_write_to_disk:
+			rootfolder = os.path.join(dataFolderPath, repo_name)
+			self.write_json_to_file(os.path.join(rootfolder, "milestones", str(milestone["id"]) + ".json"), milestone)
+
+	def write_project_release_to_disk(self, repo_name, release):
+		"""
+		Writes a release of a repository to disk.
+
+		:param repo_name: the name of the repository.
+		:param release: the release to be written to disk.
+		"""
+		if always_write_to_disk:
+			rootfolder = os.path.join(dataFolderPath, repo_name)
+			self.write_json_to_file(os.path.join(rootfolder, "releases", str(release["id"]) + ".json"), release)
+
+	def write_project_pull_to_disk(self, repo_name, pull):
+		"""
+		Writes a pull request of a repository to disk.
+
+		:param repo_name: the name of the repository.
+		:param pull: the pull request to be written to disk.
+		"""
+		if always_write_to_disk:
+			rootfolder = os.path.join(dataFolderPath, repo_name)
+			self.write_json_to_file(os.path.join(rootfolder, "pulls", str(pull["id"]) + ".json"), pull)
+
+	def write_project_pull_comment_to_disk(self, repo_name, pull_comment):
+		"""
+		Writes a pull request comment of a repository to disk.
+
+		:param repo_name: the name of the repository.
+		:param pull_comment: the pull request comment to be written to disk.
+		"""
+		if always_write_to_disk:
+			rootfolder = os.path.join(dataFolderPath, repo_name)
+			self.write_json_to_file(os.path.join(rootfolder, "pullComments", str(pull_comment["id"]) + ".json"), pull_comment)
 

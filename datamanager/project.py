@@ -153,9 +153,88 @@ class Project(dict):
 
 	def add_contributor(self, contributor):
 		"""
-		Adds a commit comment to the repository.
+		Adds a contributor to the repository.
 
-		:param contributor: the commit comment to be added to the repository.
+		:param contributor: the contributor to be added to the repository.
 		"""
 		self["contributors"][contributor["id"]] = contributor
 
+	def milestone_exists(self, milestone):
+		"""
+		Checks if the given commit comment exists in the project.
+
+		:param milestone: the commit comment to be checked.
+		:returns: True if the given commit comment exists in the project, or False otherwise.
+		"""
+		return milestone["id"] in self["milestones"]
+
+	def add_milestone(self, milestone):
+		"""
+		Adds a milestone to the repository.
+
+		:param milestone: the milestone to be added to the repository.
+		"""
+		self["milestones"][milestone["id"]] = milestone
+
+	def release_exists(self, release):
+		"""
+		Checks if the given commit comment exists in the project.
+
+		:param release: the commit comment to be checked.
+		:returns: True if the given commit comment exists in the project, or False otherwise.
+		"""
+		return release["id"] in self["releases"]
+
+	def add_release(self, release):
+		"""
+		Adds a release to the repository.
+
+		:param release: the release to be added to the repository.
+		"""
+		self["releases"][release["id"]] = release
+
+	def pull_exists(self, pull):
+		"""
+		Checks if the given pull request exists in the project.
+
+		:param pull: the pull request to be checked.
+		:returns: True if the given pull request exists in the project, or False otherwise.
+		"""
+		return pull["id"] in self["pulls"]
+
+	def full_pull_exists(self, pull):
+		"""
+		Checks if the given pull request exists in the project in its full version (including merged_by).
+
+		:param pull: the pull request to be checked.
+		:returns: True if the given pull request exists in the project, or False otherwise.
+		"""
+		if pull["id"] in self["pulls"]:
+			return "merged_by" in self["pulls"][pull["id"]]
+		else:
+			return False
+
+	def add_pull(self, pull):
+		"""
+		Adds a pull request to the repository.
+
+		:param pull: the pull request to be added to the repository.
+		"""
+		self["pulls"][pull["id"]] = pull
+
+	def pull_comment_exists(self, pull_comment):
+		"""
+		Checks if the given pull request comment exists in the project.
+
+		:param pull_comment: the pull request comment to be checked.
+		:returns: True if the given pull request comment exists in the project, or False otherwise.
+		"""
+		return pull_comment["id"] in self["pullComments"]
+
+	def add_pull_comment(self, pull_comment):
+		"""
+		Adds a pull request comment to the repository.
+
+		:param pull_comment: the pull request comment to be added to the repository.
+		"""
+		self["pullComments"][pull_comment["id"]] = pull_comment
