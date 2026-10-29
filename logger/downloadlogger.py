@@ -47,7 +47,7 @@ class Logger:
 		methods start_action and end_action.
 		"""
 		self.current_action_step += 1
-		if self.verbose == 2:
+		if self.verbose == 2 and self.current_action_length:
 			fragment = self.current_action_step / self.current_action_length
 			percentage = int(100 * fragment)
 			progress_bar_size = 20

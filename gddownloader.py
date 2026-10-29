@@ -1,6 +1,7 @@
 import os
 import sys
 import traceback
+from datetime import datetime, timezone
 from logger.downloadlogger import Logger
 from datamanager.dbmanager import DBManager
 from downloader.gitdownloader import GitDownloader
@@ -34,17 +35,24 @@ def download_repo(repo_address):
 	if db.project_exists(repo_name):
 		if update_existing_repos:
 			lg.log_action("Project already exists! Updating...")
-		else:
-			lg.log_action("Project already exists! Skipping...")
+		elif db.project_crawl_complete(repo_name):
+			lg.log_action("Project already exists and was completely downloaded! Skipping...")
 			return
+		else:
+			lg.log_action("Project already exists but its last crawl was incomplete! Resuming...")
 
 	db.initialize_write_to_disk(repo_name)
 
 	project = db.read_project_from_disk(repo_name)
 
+	crawldatetime = datetime.now(timezone.utc).replace(microsecond=0)
+	lastcrawlcomplete = False
 	try:
 		project_info = ghd.download_object(repo_api_address)
 		project.add_info(project_info)
+		# Mark the crawl as incomplete right away, so that a process that is killed (and thus never reaches
+		# the finally block below) cannot leave a stale "complete" flag from a previous crawl behind.
+		project["info"]["lastcrawlcomplete"] = False
 		db.write_project_info_to_disk(repo_name, project["info"])
 
 		lg.start_action("Retrieving project statistics...", 6)
@@ -217,12 +225,14 @@ def download_repo(repo_address):
 				gd.git_pull(git_repo_path)
 			lg.end_action()
 
+		lastcrawlcomplete = True
 	except Exception:
 		# Catch any exception and print it before exiting
+		lastcrawlcomplete = False
 		sys.exit(traceback.format_exc())
 	finally:
 		# This line of code is always executed even if an exception occurs
-		db.finalize_write_to_disk(repo_name, project)
+		db.finalize_write_to_disk(repo_name, project, crawldatetime, lastcrawlcomplete)
 
 if __name__ == "__main__":
 	if ((not sys.argv) or len(sys.argv) <= 1):

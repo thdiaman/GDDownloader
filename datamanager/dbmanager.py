@@ -69,12 +69,25 @@ class DBManager(FileManager):
 		"""
 		return os.path.exists(os.path.join(dataFolderPath, repo_name, "info.json"))
 
-	def finalize_write_to_disk(self, repo_name, project):
+	def project_crawl_complete(self, repo_name):
+		"""
+		Checks whether the last crawl of a project was completed normally. Projects that were downloaded
+		before this flag was introduced are reported as not complete.
+
+		:param repo_name: the name of the repository.
+		:returns: True if the last crawl of the project was complete, or False otherwise.
+		"""
+		info = self.read_json_from_file_if_it_exists(os.path.join(dataFolderPath, repo_name, "info.json"))
+		return bool(info.get("lastcrawlcomplete", False))
+
+	def finalize_write_to_disk(self, repo_name, project, crawldatetime, lastcrawlcomplete):
 		"""
 		Finalizes the writing of a project to disk. Closes any open buffers.
 
 		:param repo_name: the name of the repository to be written to disk.
 		:param project: the repository data to be written to disk.
+		:param crawldatetime: the time that this crawl started.
+		:param lastcrawlcomplete: the status of the last crawl, either True for complete of False otherwise.
 		"""
 		if not always_write_to_disk:
 			rootfolder = os.path.join(dataFolderPath, repo_name)
@@ -100,6 +113,12 @@ class DBManager(FileManager):
 				self.write_json_to_file(os.path.join(rootfolder, "pullComments", str(pull_comment["id"]) + ".json"), pull_comment)
 			for pull_commit in project["pulls"].values():
 				self.write_json_to_file(os.path.join(rootfolder, "pullCommits", str(pull_commit["sha"]) + ".json"), pull_commit)
+		if project.info_exists():
+			# Record the outcome of this crawl in the project info
+			project["info"]["lastcrawlcomplete"] = lastcrawlcomplete
+			project["info"]["lastcrawled"] = crawldatetime
+			self.write_json_to_file(os.path.join(dataFolderPath, repo_name, "info.json"), project["info"])
+
 
 	def write_project_info_to_disk(self, repo_name, info):
 		"""

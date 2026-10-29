@@ -77,12 +77,26 @@ class MongoDBManager(DatabaseManager, FileManager):
 		"""
 		return self.projects.find_one({"repo_name": repo_name})
 
-	def finalize_write_to_disk(self, repo_name, project):
+	def project_crawl_complete(self, repo_name):
+		"""
+		Checks whether the last crawl of a project was completed normally. This is a lightweight check
+		(it only reads the crawl flag, not the whole project). Projects that were downloaded before this
+		flag was introduced are reported as not complete.
+
+		:param repo_name: the name of the repository.
+		:returns: True if the last crawl of the project was complete, or False otherwise.
+		"""
+		info = self.projects.find_one({"repo_name": repo_name}, {"lastcrawlcomplete": 1})
+		return bool(info) and bool(info.get("lastcrawlcomplete", False))
+
+	def finalize_write_to_disk(self, repo_name, project, crawldatetime, lastcrawlcomplete):
 		"""
 		Finalizes the writing of a project to disk. Closes any open buffers.
 
 		:param repo_name: the name of the repository to be written to disk.
 		:param project: the repository data to be written to disk.
+		:param crawldatetime: the time that this crawl started.
+		:param lastcrawlcomplete: the status of the last crawl, either True for complete of False otherwise.
 		"""
 		if not always_write_to_disk:
 			project["info"]["_id"] = project["info"]["id"]
@@ -131,6 +145,9 @@ class MongoDBManager(DatabaseManager, FileManager):
 				pull_comment["_id"] = pull_comment["id"]
 				pull_comment["repo_name"] = repo_name
 			self.update_multiple(self.pullComments, project["pullComments"].values(), upsert = True)
+		if project.info_exists() and "_id" in project["info"]:
+			# Record the outcome of this crawl (only the two crawl-status fields are touched)
+			self.projects.update_one({"_id": project["info"]["_id"]}, {"$set": {"lastcrawlcomplete": lastcrawlcomplete, "lastcrawled": crawldatetime}}, upsert = True)
 
 	def write_project_info_to_disk(self, repo_name, info):
 		"""

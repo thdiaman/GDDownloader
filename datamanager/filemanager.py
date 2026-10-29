@@ -61,5 +61,5 @@ class FileManager:
 		:param data: the JSON data to be written to file.
 		"""
 		with codecs.open(filename, 'w', 'utf-8') as outfile:
-			json.dump(data, fp = outfile, sort_keys = True, indent = 3, ensure_ascii = False)
+			json.dump(data, fp = outfile, sort_keys = True, indent = 3, ensure_ascii = False, default = str)
 

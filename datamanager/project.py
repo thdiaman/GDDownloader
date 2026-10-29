@@ -1,4 +1,6 @@
 
+from dateutil.parser import parse
+
 class Project(dict):
 	"""
 	Class that includes the data of a GitHub project. This class is implemented as a dict
@@ -238,3 +240,21 @@ class Project(dict):
 		:param pull_comment: the pull request comment to be added to the repository.
 		"""
 		self["pullComments"][pull_comment["id"]] = pull_comment
+
+	def last_crawl_complete(self):
+		"""
+		Returns true if the last crawl was completed normally, or false otherwise (including the
+		case of projects that were downloaded before this flag was introduced).
+
+		:returns: true if the last crawl was completed normally, or false otherwise.
+		"""
+		return bool(self["info"]) and self["info"].get("lastcrawlcomplete", False)
+
+	def last_crawled(self):
+		"""
+		Returns the datetime when the project was last crawled.
+
+		:returns: the datetime when the project was last crawled as a datetime object, or None if unknown.
+		"""
+		return parse(str(self["info"]["lastcrawled"])) if self["info"] and "lastcrawled" in self["info"] else None
+

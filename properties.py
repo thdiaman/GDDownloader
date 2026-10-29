@@ -31,8 +31,13 @@ download_issue_events = True
 download_commits = True
 download_commit_comments = True
 download_contributors = True
+download_milestones = True    
+download_releases = True    
+download_pull_requests = True    
+download_pull_request_comments = True
 download_source_code = False
 
-# Select whether the downloaded issues and commits information will be full
+# Select whether the downloaded issues, commits and pull requests information will be full
 download_issues_full = True
 download_commits_full = True
+download_pulls_full = True

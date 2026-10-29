@@ -74,23 +74,21 @@ class GithubDownloader:
 		:param headers: the headers of the request.
 		:returns: the response of the request.
 		"""
-		for _ in range(3):
+		# Build the query string and headers once, outside the retry loop (rebuilding them
+		# inside the loop would corrupt them on the second attempt).
+		querystring = ('?' + '&'.join(parameters)) if parameters else ""
+		requestheaders = {headers.split(':')[0].strip() : headers.split(':')[1].strip()} if headers else {}
+		requestheaders['Authorization'] = 'token ' + self.credentials
+		for attempt in range(5):
 			try:
-				if parameters:
-					parameters = '?' + '&'.join(parameters)
-				else:
-					parameters = ""
-				if headers:
-					headers = {headers.split(':')[0].strip() : headers.split(':')[1].strip()}
-				else:
-					headers = {}
-				headers['Authorization'] = 'token ' + self.credentials
-				r = requests.get(address + parameters, headers = headers)
+				r = requests.get(address + querystring, headers = requestheaders, timeout = 60)
 				self.set_request_number(r.headers['x-ratelimit-remaining'] if 'x-ratelimit-remaining' in r.headers else None, \
 										r.headers['x-ratelimit-reset']  if 'x-ratelimit-reset' in r.headers else None, "api.github.com/search" in address)
 				return r
-			except TimeoutError or ConnectionError:
-				return None
+			except (TimeoutError, requests.exceptions.RequestException):
+				# transient network error (timeout, dropped/incomplete response, ...): back off and retry (30s, 60s, 90s, ...)
+				time.sleep(30 * (attempt + 1))
+		return None
 
 	def download_object(self, address, parameters = None, headers = None):
 		"""
